@@ -35,12 +35,13 @@ const particlesOptions = {
 
 class App extends Component {
   constructor() {
-    super(); // so we can use this
+    super(); // so we can use 'this'
     this.state = {
       input: '',
       imageURL: '',
       box: {},
       route: 'signin',
+      isSignedIn: false,
     }
   }
 
@@ -78,29 +79,38 @@ class App extends Component {
   }
 
   onRouteChange = (route) => {
+    if (route === 'signout') {
+      this.setState({isSignedIn: false});
+    } else if (route === 'home') {
+      this.setState({isSignedIn: true});
+    }
     this.setState({route: route});
   }
 
   render() {
+    const { isSignedIn, route, box, imageURL } = this.state; // destructuring
+
     return (
       <div className="App">
         <Particles 
           className="particles"
           params={particlesOptions} />
-        <Navigation onRouteChange={this.onRouteChange} />
+        <Navigation onRouteChange={this.onRouteChange} isSignedIn={isSignedIn} />
         <Logo />
-        <Register />
-        { this.state.route === 'signin' 
-          ? <SignIn onRouteChange={this.onRouteChange} />
-          : <div>
+        { route === 'home' 
+          ? <div>
               <Rank />
               <ImageLinkForm 
                 onInputChange={this.onInputChange} 
                 onButtonSubmit={this.onButtonSubmit} 
               />
-              <FaceRecognition box={this.state.box} imageURL={this.state.imageURL} />
+              <FaceRecognition box={box} imageURL={imageURL} />
             </div>
-          }
+          : ( route === 'signin' 
+            ? <SignIn onRouteChange={this.onRouteChange} />
+            : <Register onRouteChange={this.onRouteChange} />
+          ) 
+        }
       </div>
     );
   }
